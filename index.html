@@ -63,6 +63,11 @@
 </head>
 
 <body>
+
+    <form id="nickname-form" action="">
+        <input id="nickname-input" placeholder="Change Nickname" /><button>Change</button>
+    </form>
+
     <ul id="messages"></ul>
     <form id="form" action="">
         <input id="input" autocomplete="off" /><button>Send</button>
@@ -75,6 +80,16 @@
         var messages = document.getElementById('messages');
         var form = document.getElementById('form');
         var input = document.getElementById('input');
+        var nickname_form = document.getElementById('nickname-form');
+        var nickname_input = document.getElementById('nickname-input');
+
+        nickname_form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (nickname_input.value) {
+                socket.emit('nickname changed', nickname_input.value);
+                nickname_input.value = '';
+            }
+        })
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -83,6 +98,12 @@
                 input.value = '';
             }
         });
+        socket.on('typing', function (msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        })
         socket.on('chat message', function (msg) {
             var item = document.createElement('li');
             item.textContent = msg;
@@ -91,6 +112,20 @@
         });
 
         socket.on("disconnected", function (msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        })
+
+        socket.on("new connection", function (msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        })
+
+        socket.on('nickname_change_notif', function (msg) {
             var item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);

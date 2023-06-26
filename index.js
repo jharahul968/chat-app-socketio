@@ -8,12 +8,21 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  socket.on("chat message", msg => {
-    io.emit("chat message", msg);
+  socket.nickname = "Guest";
+  io.emit("new connection", "a new user connected");
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", socket.nickname + " : " + msg);
   });
-  socket.on("disconnect", ()=>{
-    io.emit("disconnected", "a user disconnected")
-  })
+  socket.on("disconnect", () => {
+    io.emit("disconnected", "a user disconnected");
+  });
+  socket.on("nickname changed", (msg) => {
+    socket.nickname = msg;
+    io.emit("nickname_change_notif", `Nickname changed to ${msg}`);
+  });
+  socket.on("typing", () => {
+    io.emit("typing", "typing");
+  });
 });
 
 http.listen(3000, () => {
