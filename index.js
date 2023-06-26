@@ -11,6 +11,9 @@ io.on("connection", (socket) => {
   socket.on("chat message", msg => {
     io.emit("chat message", msg);
   });
+  socket.on("disconnect", ()=>{
+    io.emit("disconnected", "a user disconnected")
+  })
 });
 
 http.listen(3000, () => {
