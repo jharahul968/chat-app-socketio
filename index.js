@@ -21,7 +21,7 @@ io.on("connection", (socket) => {
     io.emit("nickname_change_notif", `Nickname changed to ${msg}`);
   });
   socket.on("typing", () => {
-    io.emit("typing", "typing");
+    io.emit("io-typing", `${socket.nickname} is typing`);
   });
 });
 

@@ -76,6 +76,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
+        imtyping = false;
 
         var messages = document.getElementById('messages');
         var form = document.getElementById('form');
@@ -90,21 +91,36 @@
                 nickname_input.value = '';
             }
         })
+        form.addEventListener('input', function (e) {
+            if (imtyping === false) {
+                socket.emit('typing');
+                imtyping = true;
+            }
+        })
+        socket.on('io-typing', function (msg) {
+            var item = document.createElement('li');
+            item.className = 'typing-element';
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        })
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             if (input.value) {
                 socket.emit('chat message', input.value);
                 input.value = '';
+                imtyping = false;
             }
         });
-        socket.on('typing', function (msg) {
-            var item = document.createElement('li');
-            item.textContent = msg;
-            messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
-        })
         socket.on('chat message', function (msg) {
+
+            var elements = document.getElementsByClassName('typing-element');
+            var elementArray = Array.from(elements);
+            elementArray.forEach(function (element) {
+                element.parentNode.removeChild(element);
+            })
+
             var item = document.createElement('li');
             item.textContent = msg;
             messages.appendChild(item);
